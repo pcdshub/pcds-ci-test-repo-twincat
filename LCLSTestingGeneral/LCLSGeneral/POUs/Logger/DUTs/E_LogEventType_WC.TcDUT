@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
+  <DUT Name="E_LogEventType_WC" Id="{41a38ba2-b823-46ca-a56d-cbe0e0b7bac7}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_LogEventType_WC :
+(
+    AlarmCleared 	:= 0,
+    AlarmConfirmed 	:= 1,
+    AlarmRaised 	:= 2,
+    MessageSent 	:= 3
+);
+END_TYPE
+
+(* Note: this is the working copy version that is automatically made a
+   global type when pinning ST_LoggingEventInfo *)]]></Declaration>
+  </DUT>
+</TcPlcObject>
