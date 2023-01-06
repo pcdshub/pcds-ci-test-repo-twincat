@@ -1,125 +1,23 @@
-name: TwinCAT Style Check
+name: PCDS Standard Testing
 
 on:
   push:
+    branches:
+      - master
+    paths-ignore:
   pull_request:
-
-env:
-  TWINCAT_PROJECT_ROOT: .
-  TWINCAT_STYLE_EXCLUDE: __unset__
+    branches:
+      - master
+  release:
+    types:
+      - created
 
 jobs:
-  style:
-    runs-on: ubuntu-20.04
-
-    defaults:
-      run:
-        # The following allows for each run step to utilize ~/.bash_profile
-        # for setting up the per-step initial state.
-        # --login: a login shell. Source ~/.bash_profile
-        # -o pipefail: piped processes are important; fail if they fail
-        shell: bash --login -o pipefail {0}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Find all changed files
-      if: ${{ github.event_name == 'pull_request' }}
-      run: |
-        git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r -z ${{ github.head_ref }} \
-          > "$HOME/project_files.txt"
-
-    - name: Find project files
-      if: ${{ github.event_name != 'pull_request' }}
-      run: |
-        find "$TWINCAT_PROJECT_ROOT" -print0 -type f \
-          > "$HOME/project_files.txt"
-
-    - name: Filter source code files
-      if: ${{ github.event_name != 'pull_request' }}
-      run: |
-          cat "$HOME/project_files.txt" \
-            | egrep --null-data --null --ignore-case -e $"\.TcPOU$" -e $"\.TcDUT$" -e $"\.TcGVL$" \
-            | egrep --null-data --null --invert-match -e "${TWINCAT_STYLE_EXCLUDE:=__unset__}" \
-            > "$HOME/files_to_check.txt"
-
-    - name: Configure the matcher to annotate the diff
-      run: |
-        # Ref: https://github.com/actions/toolkit/blob/main/docs/problem-matchers.md
-        cat > "$HOME/grep_problem_matcher.json" <<'EOF'
-        {
-            "problemMatcher": [
-                {
-                    "owner": "eslint-compact",
-                    "pattern": [
-                        {
-                            "regexp": "^(.+):(.+):(.+):(\\d+):(.*)$",
-                            "message": 1,
-                            "severity": 2,
-                            "file": 3,
-                            "line": 4,
-                            "code": 5
-                        }
-                    ]
-                }
-            ]
-        }
-        EOF
-        echo "::add-matcher::$HOME/grep_problem_matcher.json"
-
-    - name: List the project files
-      run: |
-        cat $HOME/files.sh
-        echo "Project files are as follows:"
-        echo "-----------------------------"
-        cat "$HOME/files_to_check.txt" | xargs -0 -n1 echo
-        echo "-----------------------------"
-
-    - name: Setting up summary
-      run: |
-        (
-          echo ""
-          echo "### Style check"
-          echo ""
-        ) >> "$GITHUB_STEP_SUMMARY"
-
-    - name: Checking for leading tabs
-      run: |
-        tab_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep --line-number $'^\s*\t' | sed -e $"s/^/Leading tabs:warning:/")
-        if [ -n "${tab_lines}" ]; then
-          tab_count=$(echo "${tab_lines}" | wc -l)
-          echo "::warning::Found ${tab_count} lines with leading tabs"
-          echo "${tab_lines}"
-          exit 1
-        fi
-
-        echo "Success: Found no lines with tabs."
-
-    - name: Checking for trailing whitespace
-      # Run all checks regardless of the *previous* one passing or failing.
-      # Do not use 'always()' here in case of cancelation or prior essential
-      # steps failing.
-      if: ${{ success() || failure() }}
-      run: |
-        whitespace_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep --line-number -e $'\s+$' | sed -e $"s/^/Trailing whitespace:warning:/")
-        if [ -n "${whitespace_lines}" ]; then
-          whitespace_count=$(echo "${whitespace_lines}" | wc -l)
-          echo "::warning::Found ${whitespace_count} lines with trailing whitespace"
-          echo "${whitespace_lines}"
-          exit 1
-        fi
-
-        echo "Success: Found no lines with trailing whitespace"
-
-    - name: Checking for TwinCAT misconfiguration (Line IDs)
-      if: ${{ success() || failure() }}
-      run: |
-        lineid_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep --line-number -e $'LineId' | sed -e $"s/^/TwinCAT misconfiguration LineIDs:error:/")
-        if [ -n "${lineid_lines}" ]; then
-          lineid_count=$(echo "${lineid_lines}" | wc -l)
-          echo "::warning::Found ${lineid_count} lines with same-file debug line ids (fix your twincat config!)"
-          echo "${lineid_lines}"
-          exit 1
-        fi
-
-        echo "Success: Found no debug line ids"
+  standard:
+    uses: klauer/pcds-ci-helpers/.github/workflows/twincat-standard.yml@enh_gha
+    with:
+      # The workflow can be configured to look at a specific project directory, if
+      # desirable.  This defaults to the root of the repository (".").
+      project-root: "."
+      # Pattern (grep-compatible) of filenames to exclude in style checks.
+      style-exclude: ""
