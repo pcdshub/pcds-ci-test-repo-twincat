@@ -3,7 +3,7 @@
   <GVL Name="GVL_Logger" Id="{047a20cc-a785-4614-8465-ede098785b35}">
     <Declaration><![CDATA[{attribute 'qualified only'}
 //Global variables for logging to syslog
-	VAR_GLOBAL CONSTANT  // my whitespace line //   
+	VAR_GLOBAL CONSTANT  // my whitespace line // 
 
     (*
     Using the IP address directly avoids DNS configuration issues.

@@ -107,7 +107,7 @@ jobs:
       # steps failing.
       if: ${{ success() || failure() }}
       run: |
-        whitespace_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number -e $'\s\s*$' | sed -e $"s/^/Trailing whitespace:warning:/")
+        whitespace_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number -e $'\s\s+$' | sed -e $"s/^/Trailing whitespace:warning:/")
         if [ -n "${whitespace_lines}" ]; then
           whitespace_count=$(echo "${whitespace_lines}" | wc -l)
           echo "::warning::Found ${whitespace_count} lines with trailing whitespace"
