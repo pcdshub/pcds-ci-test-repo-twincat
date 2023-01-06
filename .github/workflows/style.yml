@@ -28,8 +28,6 @@ jobs:
     - name: Find all changed files
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        git remote -v
-        git log
         git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r -z origin/${{ github.base_ref }} \
           > "$HOME/project_files.txt"
 
@@ -40,7 +38,6 @@ jobs:
           > "$HOME/project_files.txt"
 
     - name: Filter source code files
-      if: ${{ github.event_name != 'pull_request' }}
       run: |
           cat "$HOME/project_files.txt" \
             | egrep --null-data --null --ignore-case -e $"\.TcPOU$" -e $"\.TcDUT$" -e $"\.TcGVL$" \
