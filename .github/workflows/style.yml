@@ -25,7 +25,7 @@ jobs:
         TWINCAT_PROJECT_ROOT=.
         TWINCAT_STYLE_EXCLUDE=
 
-        cat "$HOME/files.sh" > <<EOF
+        cat > "$HOME/files.sh" <<EOF
           all_files=$(find $TWINCAT_PROJECT_ROOT -regextype posix-extended -regex '.*\.(TcPOU|TcDUT|TcGVL)$')
           if [ -z "${TWINCAT_STYLE_EXCLUDE}" ]; then
             echo "${all_files}"
