@@ -29,6 +29,9 @@ jobs:
         fi
 
         TWINCAT_PROJECT_ROOT=$( cd "$TWINCAT_PROJECT_ROOT" && pwd -P )
+
+        find "$TWINCAT_PROJECT_ROOT" -type f -regextype posix-extended -regex '.*\.(TcPOU|TcDUT|TcGVL)$'
+
         cat > "$HOME/files.sh" <<EOF
           find "$TWINCAT_PROJECT_ROOT" -print0 -type f -regextype posix-extended -regex '.*\.(TcPOU|TcDUT|TcGVL)$' \
             | egrep --null-data --null --invert-match "${TWINCAT_STYLE_EXCLUDE}"
