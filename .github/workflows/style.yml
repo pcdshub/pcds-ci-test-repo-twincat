@@ -20,7 +20,7 @@ jobs:
         # -o pipefail: piped processes are important; fail if they fail
         shell: bash --login -o pipefail {0}
 
-    continue-on-error: ${{ inputs.fatal }}
+    continue-on-error: ${{ matrix.fatal }}
 
     strategy:
       fail-fast: false
@@ -105,7 +105,7 @@ jobs:
 
     - name: Checking for ${{ matrix.description }}
       run: |
-        match_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number ${{ matrix.grep_flags }} ${{ matrix.grep_for }} | sed -e $"s/^/${{ matrix.description }}:${{ matrix.severity }}:/")
+        match_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number ${{ matrix.grep_flags }} $'${{ matrix.grep_for }}' | sed -e $"s/^/${{ matrix.description }}:${{ matrix.severity }}:/")
         if [ -n "${match_lines}" ]; then
           tab_count=$(echo "${match_lines}" | wc -l)
           echo "::warning::Found ${tab_count} lines with ${{ matrix.description }}"
