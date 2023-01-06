@@ -28,11 +28,9 @@ jobs:
           TWINCAT_STYLE_EXCLUDE=__unset__
         fi
 
-        TWINCAT_PROJECT_ROOT=$( cd "$TWINCAT_PROJECT_ROOT" && pwd -P )
-
         cat > "$HOME/files.sh" <<EOF
           find "$TWINCAT_PROJECT_ROOT" -print0 -type f \
-            | egrep --null-data --null --ignore-case -e "\.TcPOU$" -e "\.TcDUT$" -e "\.TcGVL$" \
+            | egrep --null-data --null --ignore-case -e $"\.TcPOU$" -e $"\.TcDUT$" -e $"\.TcGVL$" \
             | egrep --null-data --null --invert-match -e "${TWINCAT_STYLE_EXCLUDE}"
         EOF
 
@@ -54,7 +52,8 @@ jobs:
 
     - name: Checking for leading tabs
       run: |
-        tab_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number '^\s*\t')
+        which egrep
+        tab_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number $'^\s*\t')
         if [ -n "${tab_lines}" ]; then
           tab_count=$(echo "${tab_lines}" | wc -l)
           echo "Found ${tab_count} lines with leading tabs" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -70,7 +69,7 @@ jobs:
       # steps failing.
       if: ${{ success() || failure() }}
       run: |
-        whitespace_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number -e '\s+$')
+        whitespace_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number -e $'\s+$')
         if [ -n "${whitespace_lines}" ]; then
           whitespace_count=$(echo "${whitespace_lines}" | wc -l)
           echo "Found ${whitespace_count} lines with trailing whitespace" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -83,7 +82,7 @@ jobs:
     - name: Checking for TwinCAT misconfiguration (Line IDs)
       if: ${{ success() || failure() }}
       run: |
-        lineid_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number 'LineId')
+        lineid_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number $'LineId')
         if [ -n "${lineid_lines}" ]; then
           lineid_count=$(echo "${lineid_lines}" | wc -l)
           echo "Found ${lineid_count} lines with same-file debug line ids (fix your twincat config)" | tee -a "$GITHUB_STEP_SUMMARY"
