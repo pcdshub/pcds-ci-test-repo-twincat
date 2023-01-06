@@ -33,7 +33,29 @@ jobs:
             | egrep --null-data --null --invert-match -e "${TWINCAT_STYLE_EXCLUDE}"
         EOF
 
-    - name: List project files
+    - name: Configure the matcher to annotate the diff
+      run: |
+        # Ref: https://github.com/actions/toolkit/blob/main/docs/problem-matchers.md
+        cat > "$HOME/grep_problem_matcher.json" <<'EOF'
+        {
+            "problemMatcher": [
+                {
+                    "owner": "eslint-compact",
+                    "pattern": [
+                        {
+                            "regexp": "^(.+):(\\d+):(.+)$",
+                            "file": 1,
+                            "line": 2,
+                            "code": 3
+                        }
+                    ]
+                }
+            ]
+        }
+        EOF
+        echo "::add-matcher::$HOME/grep_problem_matcher.json"
+
+    - name: List the project files
       run: |
         cat $HOME/files.sh
         echo "Project files are as follows:"
@@ -51,7 +73,6 @@ jobs:
 
     - name: Checking for leading tabs
       run: |
-        which egrep
         tab_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number $'^\s*\t')
         if [ -n "${tab_lines}" ]; then
           tab_count=$(echo "${tab_lines}" | wc -l)
