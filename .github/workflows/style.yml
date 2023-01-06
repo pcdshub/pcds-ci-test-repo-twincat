@@ -54,7 +54,7 @@ jobs:
 
     - name: Checking for leading tabs
       run: |
-        tab_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 grep -En $'^\s*\t')
+        tab_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number '^\s*\t')
         if [ -n "${tab_lines}" ]; then
           tab_count=$(echo "${tab_lines}" | wc -l)
           echo "Found ${tab_count} lines with leading tabs" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -70,7 +70,7 @@ jobs:
       # steps failing.
       if: ${{ success() || failure() }}
       run: |
-        whitespace_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 grep -En $' +$| +\r$')
+        whitespace_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number -e '\s+$')
         if [ -n "${whitespace_lines}" ]; then
           whitespace_count=$(echo "${whitespace_lines}" | wc -l)
           echo "Found ${whitespace_count} lines with trailing whitespace" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -83,7 +83,7 @@ jobs:
     - name: Checking for TwinCAT misconfiguration (Line IDs)
       if: ${{ success() || failure() }}
       run: |
-        lineid_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 grep -n 'LineId')
+        lineid_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number 'LineId')
         if [ -n "${lineid_lines}" ]; then
           lineid_count=$(echo "${lineid_lines}" | wc -l)
           echo "Found ${lineid_count} lines with same-file debug line ids (fix your twincat config)" | tee -a "$GITHUB_STEP_SUMMARY"
