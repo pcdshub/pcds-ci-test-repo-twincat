@@ -32,7 +32,7 @@ jobs:
 
         cat > "$HOME/files.sh" <<EOF
           find "$TWINCAT_PROJECT_ROOT" -print0 -type f \
-            | egrep --null-data --null --ignore-case -e "\.TcPOU$" -e "\.TcDUT$" -e "\.TcGVL$"
+            | egrep --null-data --null --ignore-case -e "\.TcPOU$" -e "\.TcDUT$" -e "\.TcGVL$" \
             | egrep --null-data --null --invert-match -e "${TWINCAT_STYLE_EXCLUDE}"
         EOF
 
