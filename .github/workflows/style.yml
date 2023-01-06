@@ -36,6 +36,7 @@ jobs:
 
     - name: List project files
       run: |
+        cat $HOME/files.sh
         echo "Project files are as follows:"
         echo "-----------------------------"
         bash "$HOME/files.sh" | xargs -0 -n1 echo
