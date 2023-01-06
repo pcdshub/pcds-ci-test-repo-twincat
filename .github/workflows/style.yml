@@ -26,7 +26,7 @@ jobs:
     - name: Find all changed files
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r -z ${{ github.head_ref }} \
+        git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r -z ${{ github.base_ref }} \
           > "$HOME/project_files.txt"
 
     - name: Find project files
