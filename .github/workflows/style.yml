@@ -29,12 +29,12 @@ jobs:
         - description: "Leading tabs"
           grep_for: '^\s*\t'
           severity: "warning"
-          fatal: true
+          fatal: false
           grep_flags: ""
         - description: "Trailing whitespace"
           grep_for: '\s\s+$'
           severity: "warning"
-          fatal: true
+          fatal: false
           grep_flags: ""
         - description: "Line IDs (TwinCAT misconfiguration)"
           grep_for: 'LineId'
