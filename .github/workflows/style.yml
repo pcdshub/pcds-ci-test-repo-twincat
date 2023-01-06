@@ -64,7 +64,7 @@ jobs:
       # Run all checks regardless of the *previous* one passing or failing.
       # Do not use 'always()' here in case of cancelation or prior essential
       # steps failing.
-      if: ${{ success() | failure() }}
+      if: ${{ success() || failure() }}
       run: |
         whitespace_lines=$(bash "$HOME/files.sh" | xargs -0 grep -En $' +$| +\r$')
         if [ -n "${whitespace_lines}" ]; then
@@ -77,7 +77,7 @@ jobs:
         echo "Success: Found no lines with trailing whitespace"
 
     - name: Checking for TwinCAT misconfiguration (Line IDs)
-      if: ${{ success() | failure() }}
+      if: ${{ success() || failure() }}
       run: |
         lineid_lines=$(bash "$HOME/files.sh" | xargs -0 grep -n 'LineId')
         if [ -n "${lineid_lines}" ]; then
