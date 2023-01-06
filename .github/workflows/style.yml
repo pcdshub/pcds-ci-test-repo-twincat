@@ -20,6 +20,25 @@ jobs:
         # -o pipefail: piped processes are important; fail if they fail
         shell: bash --login -o pipefail {0}
 
+    continue-on-error: ${{ inputs.fatal }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - description: "Leading tabs"
+          regex: "$'^\s*\t'"
+          severity: "warning"
+          fatal: true
+        - description: "Trailing whitespace"
+          regex: "$'\s\s+$'"
+          severity: "warning"
+          fatal: true
+        - description: "Line IDs (TwinCAT misconfiguration)"
+          regex: "$'LineId'"
+          severity: "error"
+          fatal: true
+
     steps:
     - uses: actions/checkout@v3
       with:
@@ -81,51 +100,14 @@ jobs:
         cat "$HOME/files_to_check.txt" | xargs -0 -n1 echo
         echo "-----------------------------"
 
-    - name: Setting up summary
+    - name: Checking for ${{ matrix.description }}
       run: |
-        (
-          echo ""
-          echo "### Style check"
-          echo ""
-        ) >> "$GITHUB_STEP_SUMMARY"
-
-    - name: Checking for leading tabs
-      run: |
-        tab_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number $'^\s*\t' | sed -e $"s/^/Leading tabs:warning:/")
-        if [ -n "${tab_lines}" ]; then
-          tab_count=$(echo "${tab_lines}" | wc -l)
-          echo "::warning::Found ${tab_count} lines with leading tabs"
-          echo "${tab_lines}"
+        match_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number ${{ matrix.regex }} | sed -e $"s/^/${{ matrix.description }}:${{ matrix.severity }}:/")
+        if [ -n "${match_lines}" ]; then
+          tab_count=$(echo "${match_lines}" | wc -l)
+          echo "::warning::Found ${tab_count} lines with ${{ matrix.description }}"
+          echo "${match_lines}"
           exit 1
         fi
 
-        echo "Success: Found no lines with tabs."
-
-    - name: Checking for trailing whitespace
-      # Run all checks regardless of the *previous* one passing or failing.
-      # Do not use 'always()' here in case of cancelation or prior essential
-      # steps failing.
-      if: ${{ success() || failure() }}
-      run: |
-        whitespace_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number -e $'\s\s+$' | sed -e $"s/^/Trailing whitespace:warning:/")
-        if [ -n "${whitespace_lines}" ]; then
-          whitespace_count=$(echo "${whitespace_lines}" | wc -l)
-          echo "::warning::Found ${whitespace_count} lines with trailing whitespace"
-          echo "${whitespace_lines}"
-          exit 1
-        fi
-
-        echo "Success: Found no lines with trailing whitespace"
-
-    - name: Checking for TwinCAT misconfiguration (Line IDs)
-      if: ${{ success() || failure() }}
-      run: |
-        lineid_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number -e $'LineId' | sed -e $"s/^/TwinCAT misconfiguration LineIDs:error:/")
-        if [ -n "${lineid_lines}" ]; then
-          lineid_count=$(echo "${lineid_lines}" | wc -l)
-          echo "::warning::Found ${lineid_count} lines with same-file debug line ids (fix your twincat config!)"
-          echo "${lineid_lines}"
-          exit 1
-        fi
-
-        echo "Success: Found no debug line ids"
+        echo "Success"
