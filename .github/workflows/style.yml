@@ -28,7 +28,12 @@ jobs:
     - name: Find all changed files
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r -z HEAD origin/${{ github.base_ref }} \
+        # Fancy method of saying:
+        # * What files changed from this PR (the current checked out HEAD)
+        # * To the base that we're merging into (e.g., origin/master)
+        # Note that ACMRT = added/copied/modified/renamed/type change
+        # See more in `man git-diff-tree` under `--diff-filter`
+        git diff-tree --no-commit-id --name-only --diff-filter=ACM -r -z HEAD origin/${{ github.base_ref }} \
           | tee "$HOME/project_files.txt"
 
     - name: Find project files
@@ -54,7 +59,7 @@ jobs:
                     "owner": "eslint-compact",
                     "pattern": [
                         {
-                            "regexp": "^(.+):(.+):(.+):(\\d+):(.*)$",
+                            "regexp": "^(.+):(.+):(.+):(\\d+):(.+)$",
                             "message": 1,
                             "severity": 2,
                             "file": 3,
