@@ -23,15 +23,14 @@ jobs:
     - name: Find all source code files
       run: |
         TWINCAT_PROJECT_ROOT=.
-        TWINCAT_STYLE_EXCLUDE=
+        TWINCAT_STYLE_EXCLUDE=_unset_
+        if [ -z "${TWINCAT_STYLE_EXCLUDE}" ]; then
+          TWINCAT_STYLE_EXCLUDE=__unset__
+        fi
 
         cat > "$HOME/files.sh" <<EOF
-          all_files=$(find $TWINCAT_PROJECT_ROOT -regextype posix-extended -regex '.*\.(TcPOU|TcDUT|TcGVL)$')
-          if [ -z "${TWINCAT_STYLE_EXCLUDE}" ]; then
-            echo "${all_files}"
-          else
-            echo "${all_files}" | egrep -v "${TWINCAT_STYLE_EXCLUDE}"
-          fi
+          find "$TWINCAT_PROJECT_ROOT" -print0 -regextype posix-extended -regex '.*\.(TcPOU|TcDUT|TcGVL)$') \
+            | egrep -v "${TWINCAT_STYLE_EXCLUDE}"
         EOF
 
     - name: List project files
@@ -51,7 +50,7 @@ jobs:
 
     - name: Checking for leading tabs
       run: |
-        tab_lines=$(bash "$HOME/files.sh" | xargs grep -En $'^\s*\t')
+        tab_lines=$(bash "$HOME/files.sh" | xargs -0 grep -En $'^\s*\t')
         if [ -n "${tab_lines}" ]; then
           tab_count=$(echo "${tab_lines}" | wc -l)
           echo "Found ${tab_count} lines with leading tabs" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -62,9 +61,12 @@ jobs:
         echo "Success: Found no lines with tabs."
 
     - name: Checking for trailing whitespace
-      if: ${{ always() }}
+      # Run all checks regardless of the *previous* one passing or failing.
+      # Do not use 'always()' here in case of cancelation or prior essential
+      # steps failing.
+      if: ${{ success() | failure() }}
       run: |
-        whitespace_lines=$(bash "$HOME/files.sh" | xargs grep -En $' +$| +\r$')
+        whitespace_lines=$(bash "$HOME/files.sh" | xargs -0 grep -En $' +$| +\r$')
         if [ -n "${whitespace_lines}" ]; then
           whitespace_count=$(echo "${whitespace_lines}" | wc -l)
           echo "Found ${whitespace_count} lines with trailing whitespace" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -75,9 +77,9 @@ jobs:
         echo "Success: Found no lines with trailing whitespace"
 
     - name: Checking for TwinCAT misconfiguration (Line IDs)
-      if: ${{ always() }}
+      if: ${{ success() | failure() }}
       run: |
-        lineid_lines=$(bash "$HOME/files.sh" | xargs grep -n 'LineId')
+        lineid_lines=$(bash "$HOME/files.sh" | xargs -0 grep -n 'LineId')
         if [ -n "${lineid_lines}" ]; then
           lineid_count=$(echo "${lineid_lines}" | wc -l)
           echo "Found ${lineid_count} lines with same-file debug line ids (fix your twincat config)" | tee -a "$GITHUB_STEP_SUMMARY"
