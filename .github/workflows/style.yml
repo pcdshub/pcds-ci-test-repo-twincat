@@ -10,7 +10,7 @@ env:
 
 jobs:
   style:
-    name: "${{ matrix.description}}"
+    name: "Style check: ${{ matrix.description}}"
     continue-on-error: ${{ matrix.fatal }}
     runs-on: ubuntu-20.04
 
