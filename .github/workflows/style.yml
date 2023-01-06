@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  pre-commit:
+  style:
     runs-on: ubuntu-20.04
 
     defaults:
@@ -35,6 +35,13 @@ jobs:
           fi
           echo "EOF"
         ) >> "$GITHUB_ENV"
+
+    - name: List project files
+      run: |
+        echo "Project files are as follows:"
+        echo "-----------------------------"
+        echo "${TWINCAT_PROJECT_FILES}"
+        echo "-----------------------------"
 
     - name: Setting up summary
       run: |
