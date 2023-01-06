@@ -28,8 +28,9 @@ jobs:
           TWINCAT_STYLE_EXCLUDE=__unset__
         fi
 
+        TWINCAT_PROJECT_ROOT=$( cd "$TWINCAT_PROJECT_ROOT" && pwd -P )
         cat > "$HOME/files.sh" <<EOF
-          find "$TWINCAT_PROJECT_ROOT" -print0 -regextype posix-extended -regex '.*\.(TcPOU|TcDUT|TcGVL)$') \
+          find "$TWINCAT_PROJECT_ROOT" -print0 -regextype posix-extended -regex '.*\.(TcPOU|TcDUT|TcGVL)$' \
             | egrep -v "${TWINCAT_STYLE_EXCLUDE}"
         EOF
 
