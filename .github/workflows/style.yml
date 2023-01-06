@@ -55,7 +55,7 @@ jobs:
         tab_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number $'^\s*\t')
         if [ -n "${tab_lines}" ]; then
           tab_count=$(echo "${tab_lines}" | wc -l)
-          echo ":warning::Found ${tab_count} lines with leading tabs"
+          echo "::warning::Found ${tab_count} lines with leading tabs"
           echo "${tab_lines}"
           exit 1
         fi
@@ -71,7 +71,7 @@ jobs:
         whitespace_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number -e $'\s+$')
         if [ -n "${whitespace_lines}" ]; then
           whitespace_count=$(echo "${whitespace_lines}" | wc -l)
-          echo ":warning::Found ${whitespace_count} lines with trailing whitespace"
+          echo "::warning::Found ${whitespace_count} lines with trailing whitespace"
           echo "${whitespace_lines}"
           exit 1
         fi
@@ -84,7 +84,7 @@ jobs:
         lineid_lines=$(bash "$HOME/files.sh" | xargs -0 -n1 egrep --line-number -e $'LineId')
         if [ -n "${lineid_lines}" ]; then
           lineid_count=$(echo "${lineid_lines}" | wc -l)
-          echo ":warning::Found ${lineid_count} lines with same-file debug line ids (fix your twincat config!)"
+          echo "::warning::Found ${lineid_count} lines with same-file debug line ids (fix your twincat config!)"
           echo "${lineid_lines}"
           exit 1
         fi
