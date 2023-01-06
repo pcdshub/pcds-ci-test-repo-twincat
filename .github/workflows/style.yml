@@ -43,11 +43,12 @@ jobs:
                     "owner": "eslint-compact",
                     "pattern": [
                         {
-                            "regexp": "^(.+):(.+):(\\d+):(.+)$",
+                            "regexp": "^(.+):(.+):(.+):(\\d+):(.+)$",
                             "message": 1,
-                            "file": 2,
-                            "line": 3,
-                            "code": 4
+                            "severity": 2,
+                            "file": 3,
+                            "line": 4,
+                            "code": 5
                         }
                     ]
                 }
@@ -74,7 +75,7 @@ jobs:
 
     - name: Checking for leading tabs
       run: |
-        tab_lines=$(bash "$HOME/files.sh" | xargs -0 egrep --line-number $'^\s*\t' | sed -e $"s/^/Leading tabs:/")
+        tab_lines=$(bash "$HOME/files.sh" | xargs -0 egrep --line-number $'^\s*\t' | sed -e $"s/^/Leading tabs:warning:/")
         if [ -n "${tab_lines}" ]; then
           tab_count=$(echo "${tab_lines}" | wc -l)
           echo "::warning::Found ${tab_count} lines with leading tabs"
@@ -90,7 +91,7 @@ jobs:
       # steps failing.
       if: ${{ success() || failure() }}
       run: |
-        whitespace_lines=$(bash "$HOME/files.sh" | xargs -0 egrep --line-number -e $'\s+$' | sed -e $"s/^/Trailing whitespace:/")
+        whitespace_lines=$(bash "$HOME/files.sh" | xargs -0 egrep --line-number -e $'\s+$' | sed -e $"s/^/Trailing whitespace:warning:/")
         if [ -n "${whitespace_lines}" ]; then
           whitespace_count=$(echo "${whitespace_lines}" | wc -l)
           echo "::warning::Found ${whitespace_count} lines with trailing whitespace"
@@ -103,7 +104,7 @@ jobs:
     - name: Checking for TwinCAT misconfiguration (Line IDs)
       if: ${{ success() || failure() }}
       run: |
-        lineid_lines=$(bash "$HOME/files.sh" | xargs -0 egrep --line-number -e $'LineId' | sed -e $"s/^/TwinCAT misconfiguration LineIDs:/")
+        lineid_lines=$(bash "$HOME/files.sh" | xargs -0 egrep --line-number -e $'LineId' | sed -e $"s/^/TwinCAT misconfiguration LineIDs:error:/")
         if [ -n "${lineid_lines}" ]; then
           lineid_count=$(echo "${lineid_lines}" | wc -l)
           echo "::warning::Found ${lineid_count} lines with same-file debug line ids (fix your twincat config!)"
