@@ -10,6 +10,8 @@ env:
 
 jobs:
   style:
+    name: "${{ matrix.description}}"
+    continue-on-error: ${{ matrix.fatal }}
     runs-on: ubuntu-20.04
 
     defaults:
@@ -19,8 +21,6 @@ jobs:
         # --login: a login shell. Source ~/.bash_profile
         # -o pipefail: piped processes are important; fail if they fail
         shell: bash --login -o pipefail {0}
-
-    continue-on-error: ${{ matrix.fatal }}
 
     strategy:
       fail-fast: false
