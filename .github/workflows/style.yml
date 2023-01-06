@@ -24,7 +24,7 @@ jobs:
       run: |
         TWINCAT_PROJECT_ROOT=.
         TWINCAT_STYLE_EXCLUDE=
-        all_files=$(find "${TWINCAT_PROJECT_ROOT}" -regextype posix-extended -regex '.*\.(TcPOU|TcDUT|TcGVL)$')
+        all_files=$(find "${TWINCAT_PROJECT_ROOT}" -print0 -regextype posix-extended -regex '.*\.(TcPOU|TcDUT|TcGVL)$')
 
         (
           echo "TWINCAT_PROJECT_FILES<<EOF"
@@ -53,7 +53,7 @@ jobs:
 
     - name: Checking for leading tabs
       run: |
-        tab_lines=$(echo "$TWINCAT_PROJECT_FILES" | xargs grep -En $'^\s*\t')
+        tab_lines=$(echo "$TWINCAT_PROJECT_FILES" | xargs -0 grep -En $'^\s*\t')
         if [ -n "${tab_lines}" ]; then
           tab_count=$(echo "${tab_lines}" | wc -l)
           echo "Found ${tab_count} lines with leading tabs" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -66,7 +66,7 @@ jobs:
     - name: Checking for trailing whitespace
       if: ${{ always() }}
       run: |
-        whitespace_lines=$(echo "$TWINCAT_PROJECT_FILES" | xargs grep -En $' +$| +\r$')
+        whitespace_lines=$(echo "$TWINCAT_PROJECT_FILES" | xargs -0 grep -En $' +$| +\r$')
         if [ -n "${whitespace_lines}" ]; then
           whitespace_count=$(echo "${whitespace_lines}" | wc -l)
           echo "Found ${whitespace_count} lines with trailing whitespace" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -79,7 +79,7 @@ jobs:
     - name: Checking for TwinCAT misconfiguration (Line IDs)
       if: ${{ always() }}
       run: |
-        lineid_lines=$(echo "$TWINCAT_PROJECT_FILES" | xargs grep -n 'LineId')
+        lineid_lines=$(echo "$TWINCAT_PROJECT_FILES" | xargs -0 grep -n 'LineId')
         if [ -n "${lineid_lines}" ]; then
           lineid_count=$(echo "${lineid_lines}" | wc -l)
           echo "Found ${lineid_count} lines with same-file debug line ids (fix your twincat config)" | tee -a "$GITHUB_STEP_SUMMARY"
