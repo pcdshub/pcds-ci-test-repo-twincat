@@ -43,7 +43,7 @@ jobs:
                     "owner": "eslint-compact",
                     "pattern": [
                         {
-                            "regexp": "^(.+):(.+):(.+):(\\d+):(.+)$",
+                            "regexp": "^(.+):(.+):(.+):(\\d+):(.*)$",
                             "message": 1,
                             "severity": 2,
                             "file": 3,
