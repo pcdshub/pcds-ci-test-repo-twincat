@@ -27,15 +27,15 @@ jobs:
       matrix:
         include:
         - description: "Leading tabs"
-          regex: "$'^\s*\t'"
+          grep_for: "$'^\s*\t'"
           severity: "warning"
           fatal: true
         - description: "Trailing whitespace"
-          regex: "$'\s\s+$'"
+          grep_for: "$'\s\s+$'"
           severity: "warning"
           fatal: true
         - description: "Line IDs (TwinCAT misconfiguration)"
-          regex: "$'LineId'"
+          grep_for: "$'LineId'"
           severity: "error"
           fatal: true
 
@@ -102,7 +102,7 @@ jobs:
 
     - name: Checking for ${{ matrix.description }}
       run: |
-        match_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number ${{ matrix.regex }} | sed -e $"s/^/${{ matrix.description }}:${{ matrix.severity }}:/")
+        match_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number ${{ matrix.grep_for }} | sed -e $"s/^/${{ matrix.description }}:${{ matrix.severity }}:/")
         if [ -n "${match_lines}" ]; then
           tab_count=$(echo "${match_lines}" | wc -l)
           echo "::warning::Found ${tab_count} lines with ${{ matrix.description }}"
