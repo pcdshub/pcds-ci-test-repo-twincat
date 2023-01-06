@@ -29,7 +29,7 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       run: |
         git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r -z origin/${{ github.base_ref }} \
-          > "$HOME/project_files.txt"
+          | tee "$HOME/project_files.txt"
 
     - name: Find project files
       if: ${{ github.event_name != 'pull_request' }}
