@@ -22,11 +22,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
     - name: Find all changed files
       if: ${{ github.event_name == 'pull_request' }}
       run: |
         git remote -v
+        git log
         git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r -z origin/${{ github.base_ref }} \
           > "$HOME/project_files.txt"
 
