@@ -3,7 +3,7 @@
   <DUT Name="ST_PendingEvent" Id="{abbfd234-3623-42a3-aa27-c85d027ac193}">
     <Declaration><![CDATA[TYPE ST_PendingEvent :
 STRUCT
-
+   // pending event  
     {attribute 'pytmc' := '
         pv:
     '}
