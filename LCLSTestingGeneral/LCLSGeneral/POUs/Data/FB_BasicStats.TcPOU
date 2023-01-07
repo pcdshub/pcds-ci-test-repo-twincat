@@ -13,8 +13,9 @@
 VAR_IN_OUT
     // Input array of floats
     {attribute 'pytmc' := '
-        pv: STATS:DATA
-        io: i
+      pv: STATS:DATA
+      PRAGMALINT
+      io: i
     '}
     aSignal: ARRAY[*] OF LREAL;
 END_VAR
@@ -32,6 +33,7 @@ VAR_INPUT
     {attribute 'pytmc' := '
         pv: STATS:NELM
         io: i
+        field: BADFIELD 1000
     '}
     nElems: UDINT;
 END_VAR
