@@ -14,8 +14,7 @@ VAR_IN_OUT
     // Input array of floats
     {attribute 'pytmc' := '
       pv: STATS:DATA
-      PRAGMALINT
-      io: i
+      io: linty
     '}
     aSignal: ARRAY[*] OF LREAL;
 END_VAR

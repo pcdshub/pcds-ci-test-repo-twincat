@@ -23811,6 +23811,7 @@
                 <Value>
         pv: @(PREFIX)LCLSGeneral:LogMessageCount
         io: i
+        field: BADFIELD 1000
         field: DESC Total log messages on the last cycle
     </Value>
               </Property>
